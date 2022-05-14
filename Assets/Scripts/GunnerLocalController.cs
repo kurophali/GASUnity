@@ -9,7 +9,6 @@ public class GunnerLocalController : NetworkBehaviour
     PlayerInput mInput;
     InputAction mMove, mFire;
     IGameplayEntity mGameplayEntity;
-    int mAbilityFireIdx;
     int mAbilityMovementIdx;
 
     private void Start()
@@ -28,20 +27,15 @@ public class GunnerLocalController : NetworkBehaviour
         mMove = mInput.actions["Movement"];
         mFire = mInput.actions["Fire"];
 
-        // Get id from assembly
-        mAbilityFireIdx = IGameplayAbility.gAbilityNameToIndex[typeof(GADisplayMessage).Name];
-        mAbilityMovementIdx = IGameplayAbility.gAbilityNameToIndex[typeof(GAMovement).Name];
 
-        // Add the ability from id
-        mGameplayEntity.CmdAddAbility(mAbilityFireIdx);
-        mGameplayEntity.CmdAddAbility(mAbilityMovementIdx);
+        mGameplayEntity.AddAbility(typeof(GAMovement), ref mAbilityMovementIdx);
 
         mFire.performed += _ => Fire();
     }
 
     void Fire()
     {
-        mGameplayEntity.CmdTriggerAbility(mAbilityFireIdx, new Vector3(0,0,0));
+
     }
 
     void Update()

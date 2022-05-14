@@ -63,4 +63,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
+  factionDisplay: {fileID: 0}
   mGunnerPrefab: {fileID: 6586059979289709405, guid: cf0535a6812e3cc4b830cc12b5c94ff1, type: 3}

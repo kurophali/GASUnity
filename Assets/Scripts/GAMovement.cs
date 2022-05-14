@@ -4,48 +4,22 @@ using UnityEngine;
 
 public class GAMovement : IGameplayAbility
 {
-    protected override int VFOnTriggerDetected()
+
+    public override int VFOnServerUpdateAllyRpcs(IGameplayEntity caster, Vector3 allyTriggerVector)
     {
+        caster.RpcTranslate(allyTriggerVector);
+        return 0;
+    }
+    public override int VFOnServerUpdateEnemyRpcs(IGameplayEntity caster, Vector3 enemyTriggerVector)
+    {
+        caster.RpcTranslate(enemyTriggerVector);
         return 0;
     }
 
-    protected override int VFOnUpdate()
+    public override int VFOnServerUpdateItself(IGameplayEntity caster, Vector3 serverTriggerVector) 
     {
-        Debug.Log("Running VFOnUpdate with Vector " + mTriggerVector);
-        mAbilityOwner.gameObject.transform.position += mTriggerVector * Time.deltaTime;
-
+        caster.Translate(serverTriggerVector);
         return 0;
     }
 
-    public override int VFOnClientTrigger(Vector3 triggerVector)
-    {
-        mTriggerVector = triggerVector;
-        //Debug.Log(triggerVector);
-        return 0;
-    }
-
-    public override Vector3 VFProcessTriggerVectorForAllies(Vector3 triggerVector)
-    {
-        return mTriggerVector;
-    }
-
-    public override Vector3 VFProcessTriggerVectorForEnemies(Vector3 triggerVector)
-    {
-        return triggerVector;
-    }
-
-    public override int VFRelease()
-    {
-        return 0;
-    }
-
-    protected override int VFTriggerValidator(IGameplayEntity caster)
-    {
-        return 0;
-    }
-
-    public override int VFValidateEntityForAbility(IGameplayEntity gameplayEntity)
-    {
-        return 0;
-    }
 }

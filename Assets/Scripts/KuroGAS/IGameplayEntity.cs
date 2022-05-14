@@ -44,7 +44,12 @@ public class IGameplayEntity : NetworkBehaviour
         mProperty.faction = newFaction;
     }
 
-    [Command] public void CmdAddAbility(int abilityID)
+    public void AddAbility(Type abilityType, ref int abilityID)
+    {
+        abilityID = IGameplayAbility.gAbilityNameToIndex[abilityType.Name];
+        this.CmdAddAbility(abilityID);
+    }
+    [Command] private void CmdAddAbility(int abilityID)
     {
         int result = IGameplayAbility.gAbilityDefaults[abilityID].VFValidateEntityForAbility(this);
         if (result != 0) return;
@@ -86,8 +91,9 @@ public class IGameplayEntity : NetworkBehaviour
         this.mAvailableAbilities[abilityID] = true;
         this.mAbilities[abilityID].SetOwner(this);
     }
-    #endregion 
+    #endregion
 
+    #region TRIGGERING_ABILITY
     [Command] public void CmdTriggerAbility(int abilityID, Vector3 triggerVector)
     {
         // Trigger the ability if this entity has the ability
@@ -96,40 +102,10 @@ public class IGameplayEntity : NetworkBehaviour
             || this.mAvailableAbilities[abilityID] == false) 
             return;
 
-        int triggerResult = mAbilities[abilityID].Trigger(this, triggerVector);
-        if (triggerResult != 0) return;
-
-        // Work out different cues for client side
-        Vector3 triggerVectorAllies, triggerVectorEnemies;
-        triggerVectorAllies = mAbilities[abilityID].VFProcessTriggerVectorForAllies(triggerVector);
-        triggerVectorEnemies = mAbilities[abilityID].VFProcessTriggerVectorForEnemies(triggerVector);
-
-        foreach (PlayerIdentity identity in PlayerIdentity.playerIdentities)
-        {
-            // Trigger after the data are processed on the server, so the client can't cheat
-            // In this case, triggerVectorAllies and triggerVectorEnemies are the different data for each faction
-            if(identity.playerFaction == mProperty.faction)
-            {
-                RpcPostTrigger(identity.connectionToClient,
-                    abilityID, mAbilities[abilityID].abilityState, triggerVectorAllies);
-            }
-            else
-            {
-                RpcPostTrigger(identity.connectionToClient,
-                    abilityID, mAbilities[abilityID].abilityState, triggerVectorEnemies);
-            }
-        }
+        // Processing different trigger vectors, setting the mTriggerDetected, etc...
+        int triggerResult = mAbilities[abilityID].OnServerTrigger(this, triggerVector);
 
         return;
-    }
-
-    // W.I.P. : This call uses the client's mAbilities so if the value within mAbilities in the client changes
-    //          This one will not sync
-    [TargetRpc] private void RpcPostTrigger(NetworkConnection conn, int abilityID, int abilityState,
-        Vector3 triggerVector)
-    {
-        mAbilities[abilityID].SetAbilityState(abilityState);
-        mAbilities[abilityID].VFOnClientTrigger(triggerVector);
     }
 
     private void Update()
@@ -147,10 +123,46 @@ public class IGameplayEntity : NetworkBehaviour
 
     [Server] void UpdateAbilities()
     {
-        // This part is only on the server's side because
+        // This part is only on the server's side because the client should not know what abilities have been triggered
         foreach (IGameplayAbility ability in mAbilityIDsForIteration)
         {
-            ability.Update();
+            // This is the server's local update.
+            ability.VFOnServerUpdateItself(this, ability.mTriggerVectorServer);
+
+            // Trigger different behaviours of this object for different factions in the 2 rpcs down there
+            foreach (PlayerIdentity identity in PlayerIdentity.playerIdentities)
+            {
+                if (identity.playerFaction == mProperty.faction)
+                {
+                    ability.VFOnServerUpdateAllyRpcs(this, ability.mTriggerVectorAllies);
+                }
+                else
+                {
+                    ability.VFOnServerUpdateEnemyRpcs(this, ability.mTriggerVectorAllies);
+                }
+            }
         }
     }
+
+    #endregion
+
+    #region CONTROLLER_RPCS
+    // DEBUG_HERE : Just to group functions here so I don't have to change all 3 of them
+    public void CommonTranslate(Vector3 triggerVector)
+    {
+        if (isServer)
+        {
+            Translate(triggerVector);
+            RpcTranslate(triggerVector);
+        }
+    }
+    public void Translate(Vector3 triggerVector)
+    {
+        gameObject.transform.position += triggerVector;
+    }
+    [ClientRpc] public void RpcTranslate(Vector3 translation)
+    {
+        Translate(translation);
+    }
+    #endregion
 }

@@ -2,15 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
+using UnityEngine.UI;
 
 [DisallowMultipleComponent]
 public class PlayerIdentity : NetworkBehaviour
 {
     public static int playerCount { get; private set; } = 0;
     public static List<PlayerIdentity> playerIdentities { get; private set; } = new List<PlayerIdentity>();
-
+    
     [SerializeField] GameObject mGunnerPrefab;
     GameObject mGunnerInstance;
+
+    GameObject factionDisplay;
 
     public NetworkConnection playerConnection { get; private set; } 
     public int playerFaction { get; private set; } = 0;
@@ -22,11 +25,16 @@ public class PlayerIdentity : NetworkBehaviour
             playerCount += 1;
             playerIdentities.Add(this);
             playerConnection = this.GetComponent<NetworkIdentity>().connectionToClient;
+            playerFaction = playerCount;
+            RpcSetFaction(playerFaction);
             Debug.Log("playerCount : " + playerCount);
         };
 
         if (!isLocalPlayer) return;
         CmdSpawnGunner(this.gameObject);
+
+        factionDisplay = GameObject.Find("PlayerFaction");
+        factionDisplay.GetComponent<Text>().text = "Player faction : " + playerFaction.ToString();
     }
 
     private void OnDestroy()
@@ -49,6 +57,7 @@ public class PlayerIdentity : NetworkBehaviour
         mGunnerInstance = Instantiate(mGunnerPrefab);
         IGameplayEntity gameplayEntity = mGunnerInstance.GetComponent<IGameplayEntity>();
 
+        // BUG_HERE : mProperty is not set even in Start()
         if(gameplayEntity == null)
         {
             Debug.Log("Gameplay Entity is null");
@@ -62,5 +71,8 @@ public class PlayerIdentity : NetworkBehaviour
 
     }
 
-
+    [TargetRpc] void RpcSetFaction(int faction)
+    {
+        playerFaction = faction;
+    }
 }
