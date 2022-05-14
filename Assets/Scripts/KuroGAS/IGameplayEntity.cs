@@ -4,7 +4,7 @@ using UnityEngine;
 using Mirror;
 using System;
 
-// DO NOT MAKE VIRTUAL OR ABSTRACT FUNCTIONS HERE
+// DO NOT MAKE VIRTUAL OR ABSTRACT FUNCTIONS HERE. ONLY EXTENT FOR GAMEPLAY CUE OR PROPERTIES.
 public class IGameplayEntity : NetworkBehaviour
 {
     #region ADDING_ABILITY
@@ -121,48 +121,97 @@ public class IGameplayEntity : NetworkBehaviour
         VFRelease();
     }
 
+
+    #endregion
+
+    #region GAMEPLAY_CUES
+
+    private NetworkConnection mServerRpcDestination; // This is used to decided which client to send the cues
+    private bool mServerTriggered = false; // true if the server's update has been executed. 
     [Server] void UpdateAbilities()
     {
-        // This part is only on the server's side because the client should not know what abilities have been triggered
+        // This part is about ability logics so it's only run on the server's side
         foreach (IGameplayAbility ability in mAbilityIDsForIteration)
         {
-            // This is the server's local update.
-            ability.VFOnServerUpdateItself(this, ability.mTriggerVectorServer);
+            // use this bool to fire a single trigger on the server
+            mServerTriggered = false; 
 
-            // Trigger different behaviours of this object for different factions in the 2 rpcs down there
+            // This is the server's local update. After this the mServerTriggered becomes true
+            ability.VFOnServerUpdateItself(this, ability.mTriggerVector);
+            mServerTriggered = true;
+
+            // Trigger different behaviours of this object for different factions in the two rpcs down there
             foreach (PlayerIdentity identity in PlayerIdentity.playerIdentities)
             {
+                mServerRpcDestination = identity.connectionToClient;
+
+                // The two functions define different cues for allies and enemies
                 if (identity.playerFaction == mProperty.faction)
                 {
-                    ability.VFOnServerUpdateAllyRpcs(this, ability.mTriggerVectorAllies);
+                    ability.VFOnServerUpdateAllyRpcs(this, ability.mTriggerVector);
                 }
                 else
                 {
-                    ability.VFOnServerUpdateEnemyRpcs(this, ability.mTriggerVectorAllies);
+                    ability.VFOnServerUpdateEnemyRpcs(this, ability.mTriggerVector);
                 }
             }
         }
     }
 
-    #endregion
-
-    #region CONTROLLER_RPCS
-    // DEBUG_HERE : Just to group functions here so I don't have to change all 3 of them
-    public void CommonTranslate(Vector3 triggerVector)
+    // Example : Cue function for the IGameplayAbility class for behaviours
+    // Define your every behaviour like this one
+    // Expose only one for writing ability cues
+    [Server] public void IssueTranslate(Vector3 translation)
     {
-        if (isServer)
+        Vector3 position = new Vector3(); // If I don't init here the 'else' branch will not go though compilation
+        if(mServerTriggered == false)
         {
-            Translate(triggerVector);
-            RpcTranslate(triggerVector);
+            // Restricts single run on server
+            Translate(translation);
         }
-    }
-    public void Translate(Vector3 triggerVector)
+        else
+        {
+            // Trigger everytime the onServerRpcDestination changes
+            // Better set all the values in this branch because usually the client only cares about syncing to the server
+            position = gameObject.transform.position;
+            RpcSyncTranslate(mServerRpcDestination, position); 
+        }
+    } 
+    [Server] private void Translate(Vector3 triggerVector)
     {
         gameObject.transform.position += triggerVector;
     }
-    [ClientRpc] public void RpcTranslate(Vector3 translation)
+    [TargetRpc] private void RpcSyncTranslate(NetworkConnection connectionToClient, Vector3 position)
     {
-        Translate(translation);
+        gameObject.transform.position = position;
+    }
+
+
+    // Another example to show you that when writing the server's actual gameplay code,
+    // one has to synchronize the minimum cue.
+    // But when naming the function one should always know which one causes the result.
+    // For instance here we use RpcSyncLookAt instead of RpcSyncRotation
+    [Server] public void IssueLookAt(Vector3 position)
+    {
+        // Sync rotations because we dont want other player to know enemy's focus
+        Quaternion rotation = new Quaternion(); 
+        if (mServerTriggered == false)
+        {
+            LookAt(position);
+        }
+        else
+        {
+           rotation = gameObject.transform.rotation;
+           RpcSyncLookAt(mServerRpcDestination, rotation);
+        }
+    } 
+    [Server] private void LookAt(Vector3 position)
+    {
+        gameObject.transform.LookAt(position);
+    }
+    [TargetRpc] private void RpcSyncLookAt(NetworkConnection connectionToClient, Quaternion rotation)
+    {
+        gameObject.transform.rotation = rotation;
     }
     #endregion
 }

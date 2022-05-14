@@ -4,21 +4,28 @@ using UnityEngine;
 
 public class GAMovement : IGameplayAbility
 {
-
-    public override int VFOnServerUpdateAllyRpcs(IGameplayEntity caster, Vector3 allyTriggerVector)
+    private int MovePlayer(in IGameplayEntity caster, Vector3 triggerVector)
     {
-        caster.RpcTranslate(allyTriggerVector);
-        return 0;
-    }
-    public override int VFOnServerUpdateEnemyRpcs(IGameplayEntity caster, Vector3 enemyTriggerVector)
-    {
-        caster.RpcTranslate(enemyTriggerVector);
+        caster.IssueTranslate(triggerVector);
         return 0;
     }
 
-    public override int VFOnServerUpdateItself(IGameplayEntity caster, Vector3 serverTriggerVector) 
+
+    // This behaviour shows using the same cue for all sides.
+    public override int VFOnServerUpdateAllyRpcs(in IGameplayEntity caster, Vector3 allyTriggerVector)
     {
-        caster.Translate(serverTriggerVector);
+        MovePlayer(caster, allyTriggerVector);
+        return 0;
+    }
+    public override int VFOnServerUpdateEnemyRpcs(in IGameplayEntity caster, Vector3 enemyTriggerVector)
+    {
+        MovePlayer(caster, enemyTriggerVector);
+        return 0;
+    }
+
+    public override int VFOnServerUpdateItself(in IGameplayEntity caster, Vector3 serverTriggerVector) 
+    {
+        MovePlayer(caster, serverTriggerVector);
         return 0;
     }
 

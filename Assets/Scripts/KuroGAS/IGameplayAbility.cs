@@ -64,10 +64,8 @@ public class IGameplayAbility
     #region TRIGGERING
 
     public int abilityState = 0;
-    bool mAbilityTriggered = false;
-    public Vector3 mTriggerVectorServer { get; protected set; } = new Vector3(0, 0, 0);
-    public Vector3 mTriggerVectorEnemies { get; protected set; } = new Vector3(0, 0, 0);
-    public Vector3 mTriggerVectorAllies{ get; protected set; } = new Vector3(0, 0, 0);
+    public Vector3 mTriggerVector { get; protected set; } = new Vector3(0, 0, 0);
+
     public int SetOwner(IGameplayEntity gameplayEntity)
     {
         mAbilityOwner = gameplayEntity;
@@ -75,19 +73,9 @@ public class IGameplayAbility
     }
 
     // W.I.P. Changing positions
-    public virtual int VFOnServerUpdateItself(IGameplayEntity caster, Vector3 serverTriggerVector)
-    {
-        return 0;
-    }
-    public virtual int VFOnServerUpdateAllyRpcs(IGameplayEntity caster, Vector3 allyTriggerVector) {
-
-        return 0; 
-    }
-    public virtual int VFOnServerUpdateEnemyRpcs(IGameplayEntity caster, Vector3 enemyTriggerVector)
-    {
-
-        return 0;
-    }
+    public virtual int VFOnServerUpdateItself(in IGameplayEntity caster, Vector3 serverTriggerVector){return 0;}
+    public virtual int VFOnServerUpdateAllyRpcs(in IGameplayEntity caster, Vector3 allyTriggerVector) {return 0; }
+    public virtual int VFOnServerUpdateEnemyRpcs(in IGameplayEntity caster, Vector3 enemyTriggerVector) { return 0;}
 
     protected virtual int VFOnServerTriggerValidator(IGameplayEntity caster) {
         return 0; 
@@ -96,25 +84,17 @@ public class IGameplayAbility
         return 0; 
     }
 
-    protected int VFOnServerProcessTriggerVectorForFactions(Vector3 triggerVector)
-    {
-        mTriggerVectorAllies = triggerVector;
-        mTriggerVectorEnemies = triggerVector;
-
-        return 0;
-    }
-
     // This is only on the server
     public int OnServerTrigger(IGameplayEntity caster, Vector3 triggerVector)
     {
-        mTriggerVectorServer = triggerVector;
+        this.mTriggerVector = triggerVector;
 
         int output = VFOnServerTriggerValidator(caster);
         if(output == 0)
         {
-            mAbilityTriggered = true;
-            VFOnServerProcessTriggerVectorForFactions(triggerVector);
+            output = VFOnServerTriggerDetected();
         }
+
         return output;
     }
 
