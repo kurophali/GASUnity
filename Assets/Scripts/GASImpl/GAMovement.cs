@@ -6,7 +6,13 @@ public class GAMovement : IGameplayAbility
 {
     private int MovePlayer(in IGameplayEntity caster, Vector3 triggerVector)
     {
-        caster.IssueTranslate(triggerVector);
+        triggerVector.y = 0;
+        if(triggerVector.magnitude != 0)
+        {
+            triggerVector = triggerVector.normalized;
+        }
+
+        caster.CueTranslate(triggerVector * Time.deltaTime);
         return 0;
     }
 

@@ -68,7 +68,6 @@ public class PlayerIdentity : NetworkBehaviour
         }
         mGunnerInstance.GetComponent<IGameplayEntity>().SetFaction(playerCount);
         NetworkServer.Spawn(mGunnerInstance, spawner);
-
     }
 
     [TargetRpc] void RpcSetFaction(int faction)

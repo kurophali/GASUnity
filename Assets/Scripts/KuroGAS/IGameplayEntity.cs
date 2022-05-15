@@ -4,37 +4,37 @@ using UnityEngine;
 using Mirror;
 using System;
 
+
 // DO NOT MAKE VIRTUAL OR ABSTRACT FUNCTIONS HERE. ONLY EXTENT FOR GAMEPLAY CUE OR PROPERTIES.
-public class IGameplayEntity : NetworkBehaviour
+[DisallowMultipleComponent] public class IGameplayEntity : NetworkBehaviour
 {
     #region ADDING_ABILITY
-    
-    public List<bool> mAvailableAbilities { get; private set; }
-    public List<IGameplayAbility> mAbilities { get; private set; }
+
+    public List<bool> mAvailableAbilities { get; private set; } = InitAbilityMask(IGameplayAbility.gAbilityCount);
+    public List<IGameplayAbility> mAbilities { get; private set; } = InitAbilityList(IGameplayAbility.gAbilityCount);
     public IGameplayProperty mProperty { get; private set; } = new IGameplayProperty(); // W.I.P. : Doesn't get initialized in Start()
     public NetworkIdentity mNetworkIdentity { get; private set; }
-    private List<IGameplayAbility> mAbilityIDsForIteration;
+
+    private List<IGameplayAbility> mAbilityIDsForIteration = new List<IGameplayAbility>();
 
     protected virtual void VFInitialize() { }
     protected virtual void VFRelease() { }
 
-    private void Start()
+    protected virtual void Start()
     {
         mNetworkIdentity = GetComponent<NetworkIdentity>();
 
-        //mProperty = new IGameplayProperty();
-
-        mAbilities = new List<IGameplayAbility>();
-        mAvailableAbilities = new List<bool>();
+        //mAbilities = new List<IGameplayAbility>();
+        //mAvailableAbilities = new List<bool>();
 
         // Don't use ability to prevent the client knowing the other object has ability
-        mAbilityIDsForIteration = new List<IGameplayAbility>();
+        //mAbilityIDsForIteration = new List<IGameplayAbility>();
 
-        for(int i = 0; i < IGameplayAbility.gAbilityCount; ++i)
-        {
-            mAbilities.Add(null);
-            mAvailableAbilities.Add(false);
-        }
+        //for(int i = 0; i < IGameplayAbility.gAbilityCount; ++i)
+        //{
+        //    mAbilities.Add(null);
+        //    mAvailableAbilities.Add(false);
+        //}
 
         VFInitialize();
     }
@@ -54,6 +54,11 @@ public class IGameplayEntity : NetworkBehaviour
         int result = IGameplayAbility.gAbilityDefaults[abilityID].VFValidateEntityForAbility(this);
         if (result != 0) return;
         
+        if(this.mAbilities == null)
+        {
+            Debug.Log("mAbilities is null");
+        }
+
         this.mAbilities[abilityID] = (IGameplayAbility)Activator.CreateInstance(IGameplayAbility.gAbilityTypes[abilityID]);
         this.mAvailableAbilities[abilityID] = true;
         this.mAbilityIDsForIteration.Add(mAbilities[abilityID]);
@@ -83,6 +88,7 @@ public class IGameplayEntity : NetworkBehaviour
 
     [TargetRpc] private void RpcAddAbility(NetworkConnection conn, int abilityID, int result)
     {
+        if (mAbilities == null) Debug.Log("RpcAddAbility : mAbilities is null");
         if (result != 0) return ;
         if (mAbilities[abilityID] != null) return;
         if (mAvailableAbilities[abilityID] == true) return;
@@ -108,7 +114,7 @@ public class IGameplayEntity : NetworkBehaviour
         return;
     }
 
-    private void Update()
+    protected virtual void Update()
     {
         if (isServer)
         {
@@ -161,7 +167,7 @@ public class IGameplayEntity : NetworkBehaviour
     // Example : Cue function for the IGameplayAbility class for behaviours
     // Define your every behaviour like this one
     // Expose only one for writing ability cues
-    [Server] public void IssueTranslate(Vector3 translation)
+    [Server] public virtual void CueTranslate(Vector3 translation)
     {
         Vector3 position = new Vector3(); // If I don't init here the 'else' branch will not go though compilation
         if(mServerTriggered == false)
@@ -191,7 +197,7 @@ public class IGameplayEntity : NetworkBehaviour
     // one has to synchronize the minimum cue.
     // But when naming the function one should always know which one causes the result.
     // For instance here we use RpcSyncLookAt instead of RpcSyncRotation
-    [Server] public void IssueLookAt(Vector3 position)
+    [Server] public virtual void CueLookAt(Vector3 position)
     {
         // Sync rotations because we dont want other player to know enemy's focus
         Quaternion rotation = new Quaternion(); 
@@ -212,6 +218,22 @@ public class IGameplayEntity : NetworkBehaviour
     [TargetRpc] private void RpcSyncLookAt(NetworkConnection connectionToClient, Quaternion rotation)
     {
         gameObject.transform.rotation = rotation;
+    }
+    #endregion
+
+    #region HELPERS
+    static List<IGameplayAbility> InitAbilityList(int size)
+    {
+        List<IGameplayAbility> output = new List<IGameplayAbility>();
+        for (int i = 0; i < size; ++i) output.Add(null);
+        return output;
+    }
+
+    static List<bool> InitAbilityMask(int size)
+    {
+        List<bool> output = new List<bool>();
+        for (int i = 0; i < size; ++i) output.Add(false);
+        return output;
     }
     #endregion
 }

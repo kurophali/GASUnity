@@ -41,11 +41,11 @@ GameObject:
   - component: {fileID: 3915213661544104841}
   - component: {fileID: 3786552578098334830}
   - component: {fileID: 7474379872049285137}
-  - component: {fileID: 6143923276534544401}
   - component: {fileID: 4336984729794954357}
   - component: {fileID: 7625598977271397088}
   - component: {fileID: 8344510449361052472}
-  - component: {fileID: 6527386343342247989}
+  - component: {fileID: 6552463826522482348}
+  - component: {fileID: -7007659208005056016}
   m_Layer: 0
   m_Name: Gunner
   m_TagString: Untagged
@@ -118,20 +118,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!136 &6143923276534544401
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6586059979289709405}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.5
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &4336984729794954357
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -193,7 +179,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
---- !u!114 &6527386343342247989
+--- !u!65 &6552463826522482348
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6586059979289709405}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.8291682, y: 1.8016304, z: 0.8131628}
+  m_Center: {x: -0.0019930005, y: -0.09918481, z: -0.010932207}
+--- !u!114 &-7007659208005056016
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -202,7 +201,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 6586059979289709405}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 512cfbf094640d34dbdad5c5447fbac7, type: 3}
+  m_Script: {fileID: 11500000, guid: 32b87e4677c887e4f9b865e1779ecfe2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   syncMode: 0
