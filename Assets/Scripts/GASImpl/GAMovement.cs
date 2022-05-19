@@ -12,7 +12,7 @@ public class GAMovement : IGameplayAbility
             triggerVector = triggerVector.normalized;
         }
 
-        caster.CueTranslate(triggerVector * Time.deltaTime);
+        caster.CueTranslate(triggerVector * Time.deltaTime * 3.0f);
         return 0;
     }
 
