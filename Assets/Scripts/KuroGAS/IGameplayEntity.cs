@@ -8,6 +8,38 @@ using System;
 // DO NOT MAKE VIRTUAL OR ABSTRACT FUNCTIONS HERE. ONLY EXTENT FOR GAMEPLAY CUE OR PROPERTIES.
 [DisallowMultipleComponent] public class IGameplayEntity : NetworkBehaviour
 {
+    #region CALLBACKS
+    protected virtual void Start()
+    {
+        mNetworkIdentity = GetComponent<NetworkIdentity>();
+        VFInitializeOwnership();
+        VFInitialize();
+    }
+
+    protected virtual void Update()
+    {
+        if (isServer)
+        {
+            UpdateAbilities();
+        }
+    }
+
+    private void OnDestroy()
+    {
+        VFRelease();
+    }
+    #endregion
+
+    #region OWNERSHIPS
+    IPlayerIdentity mPlayer;
+    protected virtual void VFInitializeOwnership()
+    {
+        if (isServer || !hasAuthority) return;
+        mPlayer = IPlayerIdentity.GetPlayer();
+        mPlayer.VFRegisterSpawnedObject(this);;
+    }
+    #endregion
+
     #region ADDING_ABILITY
 
     public List<bool> mAvailableAbilities { get; private set; } = InitAbilityMask(IGameplayAbility.gAbilityCount);
@@ -20,24 +52,7 @@ using System;
     protected virtual void VFInitialize() { }
     protected virtual void VFRelease() { }
 
-    protected virtual void Start()
-    {
-        mNetworkIdentity = GetComponent<NetworkIdentity>();
 
-        //mAbilities = new List<IGameplayAbility>();
-        //mAvailableAbilities = new List<bool>();
-
-        // Don't use ability to prevent the client knowing the other object has ability
-        //mAbilityIDsForIteration = new List<IGameplayAbility>();
-
-        //for(int i = 0; i < IGameplayAbility.gAbilityCount; ++i)
-        //{
-        //    mAbilities.Add(null);
-        //    mAvailableAbilities.Add(false);
-        //}
-
-        VFInitialize();
-    }
 
     public void SetFaction(int newFaction)
     {
@@ -114,18 +129,6 @@ using System;
         return;
     }
 
-    protected virtual void Update()
-    {
-        if (isServer)
-        {
-            UpdateAbilities();
-        }
-    }
-
-    private void OnDestroy()
-    {
-        VFRelease();
-    }
 
 
     #endregion
@@ -147,7 +150,7 @@ using System;
             mServerTriggered = true;
 
             // Trigger different behaviours of this object for different factions in the two rpcs down there
-            foreach (PlayerIdentity identity in PlayerIdentity.playerIdentities)
+            foreach (IPlayerIdentity identity in IPlayerIdentity.gPlayerIdentities)
             {
                 mServerRpcDestination = identity.connectionToClient;
 

@@ -10,7 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1275829003165104723}
   - component: {fileID: -3683989166500214496}
+  - component: {fileID: 6836832253178996397}
   - component: {fileID: 5166298150476778718}
+  - component: {fileID: 4137439850992734228}
   m_Layer: 0
   m_Name: PlayerIdentity
   m_TagString: Player
@@ -49,6 +51,20 @@ MonoBehaviour:
   visible: 0
   m_AssetId: 60b8fd1ad7f412e488a91071ad2862cc
   hasSpawned: 0
+--- !u!114 &6836832253178996397
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4931416125044010589}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2362bd07765757f41acf76221ee8f205, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
 --- !u!114 &5166298150476778718
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -63,5 +79,34 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  factionDisplay: {fileID: 0}
   mGunnerPrefab: {fileID: 6586059979289709405, guid: cf0535a6812e3cc4b830cc12b5c94ff1, type: 3}
+--- !u!114 &4137439850992734228
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4931416125044010589}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Actions: {fileID: -944628639613478452, guid: 1621e9cb644c8b843a2c254fd168d68c, type: 3}
+  m_NotificationBehavior: 0
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents: []
+  m_NeverAutoSwitchControlSchemes: 0
+  m_DefaultControlScheme: 
+  m_DefaultActionMap: Gunner
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 0}
