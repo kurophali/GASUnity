@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: MatForShader101
+  m_Name: PostProcessing
   m_Shader: {fileID: 4800000, guid: e4ef6dd8c6d1fdd42ac7928b78d14737, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
@@ -55,12 +55,9 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _Texture:
-        m_Texture: {fileID: 2800000, guid: 6229283e0c154804d8fc0cfd690a9a43, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _Blend: 2.32
+    - _BlurAmount: 0
+    - _BlurSize: 0
     - _BumpScale: 1
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
@@ -80,6 +77,4 @@ Material:
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _Green: {r: 0, g: 1, b: 0, a: 1}
-    - _Red: {r: 1, g: 0, b: 0, a: 1}
   m_BuildTextureStacks: []
