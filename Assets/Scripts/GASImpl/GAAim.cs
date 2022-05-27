@@ -10,17 +10,17 @@ public class GAAim : IGameplayAbility
         return 0;
     }
 
-    public override int VFOnServerUpdateAllyRpcs(in IGameplayEntity caster, Vector3 allyTriggerVector)
+    public override int VFOnServerUpdateAbilityForAllies(in IGameplayEntity caster, Vector3 allyTriggerVector)
     {
         return LookAtTarget(caster, allyTriggerVector);
     }
 
-    public override int VFOnServerUpdateEnemyRpcs(in IGameplayEntity caster, Vector3 enemyTriggerVector)
+    public override int VFOnServerUpdateAbilityForEnemies(in IGameplayEntity caster, Vector3 enemyTriggerVector)
     {
         return LookAtTarget(caster, enemyTriggerVector);
     }
 
-    public override int VFOnServerUpdateItself(in IGameplayEntity caster, Vector3 serverTriggerVector)
+    public override int VFOnServerUpdateAbility(in IGameplayEntity caster, Vector3 serverTriggerVector)
     {
         return LookAtTarget(caster, serverTriggerVector);
     }

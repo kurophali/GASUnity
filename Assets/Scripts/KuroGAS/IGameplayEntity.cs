@@ -8,11 +8,12 @@ using System;
 // DO NOT MAKE VIRTUAL OR ABSTRACT FUNCTIONS HERE. ONLY EXTENT FOR GAMEPLAY CUE OR PROPERTIES.
 [DisallowMultipleComponent] public class IGameplayEntity : NetworkBehaviour
 {
-    #region CALLBACKS
+    #region CALLBACKS || Connection to unity's behaviour callbacks
     protected virtual void Start()
     {
         mNetworkIdentity = GetComponent<NetworkIdentity>();
-        VFInitializeOwnership();
+        InitializeNodeSystem();
+        VFInitializeSpawnedObjects();
         VFInitialize();
     }
 
@@ -30,9 +31,10 @@ using System;
     }
     #endregion
 
-    #region OWNERSHIPS
+    #region SPAWNED_OBJECTS || Have the owner player add a reference to this object
+
     IPlayerIdentity mPlayer;
-    protected virtual void VFInitializeOwnership()
+    protected virtual void VFInitializeSpawnedObjects()
     {
         if (isServer || !hasAuthority) return;
         mPlayer = IPlayerIdentity.GetPlayer();
@@ -40,20 +42,44 @@ using System;
     }
     #endregion
 
-    #region ADDING_ABILITY
+    #region MODEL_FXNODES || Deals with model nodes 
+    // Model nodes are the local transforms attached to the GE prefab. 
+    // Use them as where the projectile starts or where particle spawns.
+    [SerializeField] protected List<Transform> fxNodes;
+    Dictionary<string, int> fxNodeNameToIndex = new Dictionary<string, int>();
 
+    int InitializeNodeSystem()
+    {
+        for(int i = 0; i < fxNodes.Count; ++i)
+        {
+            fxNodeNameToIndex[fxNodes[i].gameObject.name] = i;
+        }
+
+        return 0;
+    }
+    public Transform GetNode(int index)
+    {
+        if (index < 0 || index > fxNodes.Count - 1) return null;
+        return fxNodes[index];
+    }
+
+    public int FindNodeIndex(string nodeName)
+    {
+        return fxNodeNameToIndex[nodeName];
+    }
+
+    #endregion
+
+    #region ADDING_ABILITY
     public List<bool> mAvailableAbilities { get; private set; } = InitAbilityMask(IGameplayAbility.gAbilityCount);
     public List<IGameplayAbility> mAbilities { get; private set; } = InitAbilityList(IGameplayAbility.gAbilityCount);
     public IGameplayProperty mProperty { get; private set; } = new IGameplayProperty(); // W.I.P. : Doesn't get initialized in Start()
     public NetworkIdentity mNetworkIdentity { get; private set; }
-
+    // This one is used to iterate all abilities and call their UpdateAbility on Update()
     private List<IGameplayAbility> mAbilityIDsForIteration = new List<IGameplayAbility>();
 
     protected virtual void VFInitialize() { }
     protected virtual void VFRelease() { }
-
-
-
     public void SetFaction(int newFaction)
     {
         mProperty.faction = newFaction;
@@ -66,7 +92,7 @@ using System;
     }
     [Command] private void CmdAddAbility(int abilityID)
     {
-        int result = IGameplayAbility.gAbilityDefaults[abilityID].VFValidateEntityForAbility(this);
+        int result = IGameplayAbility.gAbilityDefaults[abilityID].VFOnGEAddAbilityInit(this);
         if (result != 0) return;
         
         if(this.mAbilities == null)
@@ -90,7 +116,7 @@ using System;
 
         if (mAbilities[abilityID] != null) 
         {
-            result = mAbilities[abilityID].VFRelease();
+            result = mAbilities[abilityID].VFOnGERemoveAbilityRelease();
         }
         
         if (result == 0)
@@ -133,10 +159,11 @@ using System;
 
     #endregion
 
-    #region GAMEPLAY_CUES
+    #region GAMEPLAY_CUES || Controls transforms and animations of this object on clients in different factions
 
     private NetworkConnection mServerRpcDestination; // This is used to decided which client to send the cues
     private bool mServerTriggered = false; // true if the server's update has been executed. 
+    private int mDstPlayerFaction = -1;
     [Server] void UpdateAbilities()
     {
         // This part is about ability logics so it's only run on the server's side
@@ -146,22 +173,23 @@ using System;
             mServerTriggered = false; 
 
             // This is the server's local update. After this the mServerTriggered becomes true
-            ability.VFOnServerUpdateItself(this, ability.mTriggerVector);
+            ability.VFOnServerUpdateAbility(this, ability.mTriggerVector);
             mServerTriggered = true;
 
             // Trigger different behaviours of this object for different factions in the two rpcs down there
             foreach (IPlayerIdentity identity in IPlayerIdentity.gPlayerIdentities)
             {
                 mServerRpcDestination = identity.connectionToClient;
+                mDstPlayerFaction = identity.playerFaction;
 
                 // The two functions define different cues for allies and enemies
                 if (identity.playerFaction == mProperty.faction)
                 {
-                    ability.VFOnServerUpdateAllyRpcs(this, ability.mTriggerVector);
+                    ability.VFOnServerUpdateAbilityForAllies(this, ability.mTriggerVector);
                 }
                 else
                 {
-                    ability.VFOnServerUpdateEnemyRpcs(this, ability.mTriggerVector);
+                    ability.VFOnServerUpdateAbilityForEnemies(this, ability.mTriggerVector);
                 }
             }
         }
@@ -222,6 +250,34 @@ using System;
     {
         gameObject.transform.rotation = rotation;
     }
+
+    // This example is to show how the same skill would trigger different fx on different factions
+    [Server]
+    public virtual void CueFactionalTranslate(Transform fakeTransform, Vector3 translation)
+    {
+        Vector3 position = new Vector3(); 
+        if (mServerTriggered == false)
+        {
+            gameObject.transform.position += translation;
+            fakeTransform.position -= translation;
+        }
+        else
+        {
+            if(mDstPlayerFaction == mProperty.faction)
+            {
+                position = gameObject.transform.position;
+                RpcSyncFactionalTranslate(mServerRpcDestination, position);
+            }
+
+        }
+    }
+
+
+    [TargetRpc]
+    private void RpcSyncFactionalTranslate(NetworkConnection connectionToClient, Vector3 position)
+    {
+        gameObject.transform.position = position;
+    }
     #endregion
 
     #region HELPERS
@@ -238,5 +294,6 @@ using System;
         for (int i = 0; i < size; ++i) output.Add(false);
         return output;
     }
+
     #endregion
 }

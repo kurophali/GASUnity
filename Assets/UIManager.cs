@@ -14,22 +14,22 @@ public class UIManager : MonoBehaviour
 
     public void StartClient()
     {
-        mGameSceneReference.LoadSceneAsync().Completed += (handle) =>
-        {
-            mNetworkManager.StartClient();
-        };
-        //SceneManager.LoadScene("SampleScene");
-        //mNetworkManager.StartClient();
+        //mGameSceneReference.LoadSceneAsync().Completed += (handle) =>
+        //{
+        //    mNetworkManager.StartClient();
+        //};
+        SceneManager.LoadScene("SampleScene");
+        mNetworkManager.StartClient();
     }
 
     public void StartServer()
     {
-        mGameSceneReference.LoadSceneAsync().Completed += (handle) =>
-        {
-            mNetworkManager.StartServer();
-        };
-        //SceneManager.LoadScene("SampleScene");
-        //mNetworkManager.StartServer();
+        //mGameSceneReference.LoadSceneAsync().Completed += (handle) =>
+        //{
+        //    mNetworkManager.StartServer();
+        //};
+        SceneManager.LoadScene("SampleScene");
+        mNetworkManager.StartServer();
     }
 
     public void GetDownloadSize()

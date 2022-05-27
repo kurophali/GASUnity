@@ -5,7 +5,7 @@ using Mirror;
 using UnityEngine.InputSystem;
 using Cinemachine;
 
-public class PlayerLocals : NetworkBehaviour
+public class PlayerLocalsMovement : NetworkBehaviour
 {
     PlayerInput mInput;
     InputAction mMove, mFire;
@@ -26,8 +26,8 @@ public class PlayerLocals : NetworkBehaviour
 
         Debug.Log("AssignGameplayEntity called, now before addability");
 
-        //mGEGunner.AddAbility(typeof(GAMovement), ref mGAMovementIdx);
-        mGEGunner.AddAbility(typeof(GAIllusion), ref mGAIllusionIdx);
+        mGEGunner.AddAbility(typeof(GAMovement), ref mGAMovementIdx);
+        //mGEGunner.AddAbility(typeof(GAIllusion), ref mGAIllusionIdx);
         mGEGunner.AddAbility(typeof(GAAim), ref mGAAimIdx);
 
         Debug.Log("AssignGameplayEntity called, now after addability");
@@ -70,13 +70,13 @@ public class PlayerLocals : NetworkBehaviour
     {
         if (!hasAuthority || isServer) return;
 
-        if(mGEGunner == null)// async call to initialize mCameraReference
+        if (mGEGunner == null)// async call to initialize mCameraReference
         {
             Debug.Log("Waiting for mGameplayEntity to be initialized");
             return;
         }
 
-        if(mCameraReference == null) // async call to initialize mCameraReference
+        if (mCameraReference == null) // async call to initialize mCameraReference
         {
             Debug.Log("Waiting for mCameraReference to be initialized");
             return;
@@ -88,8 +88,7 @@ public class PlayerLocals : NetworkBehaviour
         Vector3 moveDirection = moveValue.x * mMainCamTransform.right.normalized
             + moveValue.z * mMainCamTransform.forward.normalized;
 
-        //mGEGunner.CmdTriggerAbility(mGAMovementIdx, moveDirection);
-        mGEGunner.CmdTriggerAbility(mGAIllusionIdx, moveDirection);
+        mGEGunner.CmdTriggerAbility(mGAMovementIdx, moveDirection);
 
         Ray centerRay = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
         RaycastHit hit;

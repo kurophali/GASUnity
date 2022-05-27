@@ -16,23 +16,7 @@ MonoBehaviour:
   m_Data:
     m_SerializedData: []
   m_GUID: 3de3f5a7e8d82d6449abbd03463c4f9e
-  m_SerializeEntries:
-  - m_GUID: 9fc0d4010bbf28b4594072e72b8655ab
-    m_Address: Assets/Scenes/SampleScene.unity
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-  - m_GUID: 06e33edbdc9304845a5d804b8163923f
-    m_Address: Assets/Prefabs/Billboard/Billboard.mat
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-  - m_GUID: 6f4ab89e0f5e11149af8dc7bfb6a3120
-    m_Address: Assets/Prefabs/Billboard/Billboard.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-  - m_GUID: f0e5347f0fff0974bbbfa0d0149185a7
-    m_Address: Assets/Prefabs/Billboard/blue_archive_anime_girls-1986619.jpg
-    m_ReadOnly: 0
-    m_SerializedLabels: []
+  m_SerializeEntries: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: fb4087cbc09efb947a1199b929d4b8c5, type: 2}
   m_SchemaSet:

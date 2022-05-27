@@ -18,18 +18,19 @@ public class GAMovement : IGameplayAbility
 
 
     // This behaviour shows using the same cue for all sides.
-    public override int VFOnServerUpdateAllyRpcs(in IGameplayEntity caster, Vector3 allyTriggerVector)
+    public override int VFOnServerUpdateAbilityForAllies(in IGameplayEntity caster, Vector3 allyTriggerVector)
     {
         MovePlayer(caster, allyTriggerVector);
         return 0;
     }
-    public override int VFOnServerUpdateEnemyRpcs(in IGameplayEntity caster, Vector3 enemyTriggerVector)
+    public override int VFOnServerUpdateAbilityForEnemies(in IGameplayEntity caster, Vector3 enemyTriggerVector)
     {
         MovePlayer(caster, enemyTriggerVector);
+
         return 0;
     }
 
-    public override int VFOnServerUpdateItself(in IGameplayEntity caster, Vector3 serverTriggerVector) 
+    public override int VFOnServerUpdateAbility(in IGameplayEntity caster, Vector3 serverTriggerVector) 
     {
         MovePlayer(caster, serverTriggerVector);
         return 0;

@@ -10,8 +10,6 @@ public class IGameplayAbility
     public static int gAbilityCount { get; private set; }
     public static List<Type> gAbilityTypes { get; private set; }
     public static List<IGameplayAbility> gAbilityDefaults { get; private set; }
-
-
     static IGameplayAbility()
     {
         gAbilityNameToIndex = new Dictionary<string, int>();
@@ -56,9 +54,8 @@ public class IGameplayAbility
         mAbilityTypeName = this.GetType().Name;
     }
 
-
-    public virtual int VFValidateEntityForAbility(IGameplayEntity gameplayEntity) { return 0; }
-    public virtual int VFRelease() { return 0; }
+    public virtual int VFOnGEAddAbilityInit(IGameplayEntity gameplayEntity) { return 0; }
+    public virtual int VFOnGERemoveAbilityRelease() { return 0; }
     #endregion
 
     #region TRIGGERING
@@ -73,9 +70,9 @@ public class IGameplayAbility
     }
 
     // W.I.P. Changing positions
-    public virtual int VFOnServerUpdateItself(in IGameplayEntity caster, Vector3 serverTriggerVector){return 0;}
-    public virtual int VFOnServerUpdateAllyRpcs(in IGameplayEntity caster, Vector3 allyTriggerVector) {return 0; }
-    public virtual int VFOnServerUpdateEnemyRpcs(in IGameplayEntity caster, Vector3 enemyTriggerVector) { return 0;}
+    public virtual int VFOnServerUpdateAbility(in IGameplayEntity caster, Vector3 serverTriggerVector){return 0;}
+    public virtual int VFOnServerUpdateAbilityForAllies(in IGameplayEntity caster, Vector3 allyTriggerVector) {return 0; }
+    public virtual int VFOnServerUpdateAbilityForEnemies(in IGameplayEntity caster, Vector3 enemyTriggerVector) { return 0;}
 
     protected virtual int VFOnServerTriggerValidator(IGameplayEntity caster) {
         return 0; 
@@ -88,6 +85,11 @@ public class IGameplayAbility
     public int OnServerTrigger(IGameplayEntity caster, Vector3 triggerVector)
     {
         this.mTriggerVector = triggerVector;
+
+        if (mOverridden)
+        {
+            Debug.Log("Ability is overridden by another");
+        };
 
         int output = VFOnServerTriggerValidator(caster);
         if(output == 0)
@@ -105,5 +107,42 @@ public class IGameplayAbility
     }
 
 
+    #endregion
+
+    #region OVERRIDING
+    public IGameplayAbility mOverrider { get; private set; }
+    protected bool mOverridden { get; private set; } = false; // If this is true the ability will not execute OnTriggerDetected or OnUpdateXXX
+    protected int Override(IGameplayAbility ability)
+    {
+        if (mOverridden)
+        {
+            Debug.Log("Can't override an already overridden ability");
+            return 1;
+        }
+
+        mOverrider = ability;
+        mOverridden = true;
+
+        return 0;
+    }
+
+    protected int OverrideRelease(IGameplayAbility ability)
+    {
+        if(mOverrider == null || mOverridden == false)
+        {
+            Debug.Log("Can't un-override the ability when it's not overridded");
+            return 1;
+        }
+        if (ability != mOverrider)
+        {
+            Debug.Log("Can't un-override the ability from abilities that are not the overrider");
+            return 2;
+        }
+
+        mOverrider = null;
+        mOverridden = false;
+
+        return 0;
+    }
     #endregion
 }

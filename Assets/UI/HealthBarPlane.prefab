@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 892321523780637371}
   - component: {fileID: 892321523780637370}
   m_Layer: 0
-  m_Name: Plane
+  m_Name: HealthBarPlane
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

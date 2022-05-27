@@ -43,7 +43,6 @@ GameObject:
   - component: {fileID: 7474379872049285137}
   - component: {fileID: 4336984729794954357}
   - component: {fileID: 7625598977271397088}
-  - component: {fileID: 8344510449361052472}
   - component: {fileID: 6552463826522482348}
   - component: {fileID: -7007659208005056016}
   m_Layer: 0
@@ -66,6 +65,7 @@ Transform:
   m_Children:
   - {fileID: 1793571648996044780}
   - {fileID: 532278045019204967}
+  - {fileID: 8884640275960283132}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -165,20 +165,6 @@ MonoBehaviour:
   visible: 0
   m_AssetId: cf0535a6812e3cc4b830cc12b5c94ff1
   hasSpawned: 0
---- !u!114 &8344510449361052472
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6586059979289709405}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3914e5477e9b8c9449dfb01bfdc0b995, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
 --- !u!65 &6552463826522482348
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -206,6 +192,38 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
+  fxNodes:
+  - {fileID: 8884640275960283132}
+--- !u!1 &7480713447887045266
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8884640275960283132}
+  m_Layer: 0
+  m_Name: ShootingPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8884640275960283132
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7480713447887045266}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.435, z: 0.575}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 3915213661544104841}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7998269690448034518
 GameObject:
   m_ObjectHideFlags: 0
