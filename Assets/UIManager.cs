@@ -8,36 +8,51 @@ using UnityEngine.SceneManagement;
 
 public class UIManager : MonoBehaviour
 {
-    [SerializeField] AssetReference mGameSceneReference;
     [SerializeField] Text mDebugText;
-    [SerializeField] NetworkManager mNetworkManager;
+    //[SerializeField] AssetReference mSceneRef;
+    [SerializeField] GameObject mNetworkManager107Prefab;
+    [SerializeField] GameObject mNetworkManager108Prefab;
+    static GameObject mNetworkManagerInstance;
+    NetworkManager mNetworkManager;
 
-    public void StartClient()
+    public void StartClient107()
     {
-        //mGameSceneReference.LoadSceneAsync().Completed += (handle) =>
-        //{
-        //    mNetworkManager.StartClient();
-        //};
-        SceneManager.LoadScene("SampleScene");
+        mNetworkManagerInstance = Instantiate(mNetworkManager107Prefab);
+        mNetworkManager = mNetworkManagerInstance.GetComponent<NetworkManager>();
+
+        SceneManager.LoadScene("GAS107");
         mNetworkManager.StartClient();
     }
 
-    public void StartServer()
+    public void StartServer107()
     {
-        //mGameSceneReference.LoadSceneAsync().Completed += (handle) =>
-        //{
-        //    mNetworkManager.StartServer();
-        //};
-        SceneManager.LoadScene("SampleScene");
+        mNetworkManagerInstance = Instantiate(mNetworkManager107Prefab);
+        mNetworkManager = mNetworkManagerInstance.GetComponent<NetworkManager>();
+
+        SceneManager.LoadScene("GAS107");
         mNetworkManager.StartServer();
     }
-
-    public void GetDownloadSize()
+    public void StartClient108()
     {
-        Addressables.GetDownloadSizeAsync(mGameSceneReference).Completed += (handle) =>
-        {
-            long size = handle.Result;
-            mDebugText.text = size.ToString();
-        };
+        mNetworkManagerInstance = Instantiate(mNetworkManager108Prefab);
+        mNetworkManager = mNetworkManagerInstance.GetComponent<NetworkManager>();
+        SceneManager.LoadScene("GAS108");
+        mNetworkManager.StartClient();
     }
+
+    public void StartServer108()
+    {
+        mNetworkManagerInstance = Instantiate(mNetworkManager108Prefab);
+        mNetworkManager = mNetworkManagerInstance.GetComponent<NetworkManager>();
+        SceneManager.LoadScene("GAS108");
+        mNetworkManager.StartServer();
+    }
+    //public void GetDownloadSize()
+    //{
+    //    Addressables.GetDownloadSizeAsync(mGameSceneReference).Completed += (handle) =>
+    //    {
+    //        long size = handle.Result;
+    //        mDebugText.text = size.ToString();
+    //    };
+    //}
 }
